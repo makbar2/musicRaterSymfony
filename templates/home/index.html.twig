@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+{% block title %}Welcome{% endblock %}
+{% block body %}
+    <div class="row align-items-center" id="formBlock">
+        <div class="col"></div>
+        <div class="col" id="main">
+            <section>
+                <h1>Welcome to Another Album Rater</h1>
+                <p>
+                    To get started please register an account, if you already have an account please login.
+                </p>
+                <p>
+                    On this website you can rate albums, leave reviews, view artists and their albums and look at
+                    other user's reviews.
+                </p>
+            </section>
+            <section>
+                <h1>
+                   Music News
+                </h1>
+                <p>
+                    This is a list of articles from bbc-news. This data was retrieved by using <a href="https://newsapi.org/">NEWS API</a>.
+                </p>
+                {% if data is not empty %}
+                    {% for i in data %}
+                        <a href={{ i.url }}>
+                            <div class="row">
+                                <div class="row border" style="text-align: center;margin-top: 1%">
+                                    {{ i.title }}
+                                </div>
+                            </div>
+                        </a>
+
+                    {% endfor %}
+                {% endif %}
+            </section>
+
+        </div>
+        <div class="col"></div>
+    </div>
+{% endblock %}

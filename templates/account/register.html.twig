@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AccountController!{% endblock %}
+
+{% block body %}
+    <div class="row align-items-center" id="">
+        <div class="col"></div>
+        <div class="col">
+            {% if error  == 1%}
+                <div class="alert alert-danger" role="alert">
+                    user with that username already exists
+                </div>
+            {% elseif error == 2%}
+                <div class="alert alert-danger" role="alert">
+                    there was a problem when uploading your pfp
+                </div>
+            {% endif %}
+            {{ form_start(form) }}
+                <div class="row">
+                    {{ form_row(form.username)}}
+                    {% if uName %}
+                        <div class="alert alert-danger" role="alert">
+                            please pick a different username
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    {{ form_row(form.password)}}
+                </div>
+                <div class="row">
+                    {{ form_row(form.submit)}}
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+        <div class="col"></div>
+    </div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AccountController!{% endblock %}
+
+{% block body %}
+    <form action="{{ path('app_account_login') }}" method="post">
+        <label for="username">Email:</label>
+        <input type="text" id="username" name="_username" value="{{ lastUsername }}">
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="_password">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        <button type="submit">login</button>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block body %}
+    {% if user %}
+        <aside>
+        </aside>
+        <div class="row align-items-center" id="userReviews">
+            <div class="col"></div>
+            <div class="col">
+
+                <div class="row border-bottom">
+                    <img src="{{ absolute_url(asset("pictures/uploads/" ~ user.picture)) }}" alt="{{ user.username }} pfp"
+                        style="
+                        max-height: 50vh;
+                        min-width: 50vh;
+                    "
+                         class="img-thumbnail"
+                    >
+                </div>
+                <h1>{{ user.username }}</h1>
+                {% if (is_granted("ROLE_ADMIN")) and not(user.username is same as(app.user.username))%}
+                    {#
+                        stops the admin from being able to delete themselves,
+                        form hardcoded since its just one button and i need to set it's value to what ever the
+                        profile's id is
+                    #}
+                    <div class="row admin " style="margin-bottom: 2vh">
+                        {% if not(user.roles.0 is same as("ROLE_MOD"))  %}
+                            {#
+                                for some reason this does't work idk why there is no reason for it not to as the conditions
+                                by themsevles do.
+                                {% if not(user.roles.0 is same as("ROLE_MOD")) or not(user.roles.0 is same as("ROLE_ADMIN")) %}
+                            #}
+                            {% if not(user.roles.0 is same as("ROLE_ADMIN")) %}
+                                <form action="{{ path("app_account_make_mod", {'id' : user.id}) }}">
+                                    <button type="submit" value="{{ user.id }}" class="btn btn-primary">Make Moderator</button>
+                                </form>
+                            {% endif %}
+                            {% else %}
+                                    {% if (is_granted("ROLE_ADMIN")) and (user.roles.0 is same as("ROLE_MOD")) %}
+                                        <form action="{{ path("app_account_remove_mod", {'id' : user.id}) }}">
+                                            <button type="submit" value="{{ user.id }}" class="btn btn-primary">Remove Moderator Role</button>
+                                        </form>
+                                    {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="row delete">
+                        <form action="{{ path("app_account_delete", {'id' : user.id}) }}">
+                            <button type="submit" value="{{ user.id }}" class="btn btn-danger">Delete User</button>
+                        </form>
+                    </div>
+                {% endif %}
+                {% if reviews %}
+                    <h2>Reviews</h2>
+                    {% for review in reviews %}
+                        <div class="row border">
+                            <div class="col">
+                                {{ review.text }}
+                            </div>
+                            <div class="col-sm">
+                                {{ review.score }}/5
+                            </div>
+                            <div class="col">
+                                <a href="{{ path("app_album", {'id' : review.Album.id}) }}">{{ review.Album.name }}</a>
+                            </div>
+                            {% if is_granted("ROLE_MOD")  %}
+                                <form action="{{ path("app_remove_review", {"id" : review.id}) }}">
+                                    <button type="submit" value="{{ review.id }}" class="btn btn-danger">Delete review</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <h2>This user hasn't reviewed any albums yet...</h2>
+                {% endif %}
+            </div>
+            <div class="col"></div>
+        </div>
+    {% else%}
+        <div>
+            <h1>404 user not found</h1>
+        </div>
+    {% endif %}
+
+{% endblock %}
