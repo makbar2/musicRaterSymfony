@@ -1,0 +1,201 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    {% if error  == 1%}
+        <div class="alert alert-danger" role="alert">
+            Unable to get data from last fm
+        </div>
+    {% elseif error == 2%}
+        <div class="alert alert-danger" role="alert">
+            No track data entered
+        </div>
+    {% endif %}
+
+    <div class="row align-items-center" id="formBlock">
+        <div class="col"></div>
+        <div class="col">
+            <h1 style="text-align: center">
+                Add Album
+            </h1>
+            {{ form_start(form, ) }}
+            <div class="row">
+                <div class="col">
+                    {{ form_row(form.name) }}
+                </div>
+                <div class="col">
+                    {{ form_row(form.lastFM_Auto_Complete) }}
+                </div>
+             </div>
+            <div class="row">
+                {{ form_row(form.picture) }}
+            </div>
+            <div class="row">
+                {{ form_row(form.releaseDate) }}
+            </div>
+            <div class="row">
+                {{ form_row(form.Artist) }}
+            </div>
+            <div class="row">
+                {{ form_row(form.genre) }}
+            </div>
+            <div id="extra">
+                <div class="row">
+                    <button type="button" class="btn btn-secondary" id="addTrackBtn" onclick="addNewFields()">Add track</button>
+                </div>
+            </div>
+            <div id="hidden"></div>
+            <div class="row">
+                {{ form_row(form.submit) }}
+            </div>
+        {{ form_end(form) }}
+        </div>
+        <div class="col"></div>
+    </div>
+<script>
+
+    function customCheckBox()
+    {
+        /**
+         * syfmony adds a div around the form fieeld that i cant change ): so i got to do this
+          */
+        let div = document.getElementById("album_lastFM_Auto_Complete").parentNode;
+        div.className  = "form-check form-switch";
+    }
+    customCheckBox();
+
+   function lastFMSwitch(element)
+   {
+       let elementArray = ["album_picture","album_releaseDate","album_genre","addTrackBtn"];
+       if(element.checked == true)
+       {
+            document.getElementById("album_lastFM_Auto_Complete").value = true;
+            elementArray.forEach(function (i){
+                console.log(i)
+                document.getElementById(i).required = false;
+                document.getElementById(i).disabled = true;
+            })
+       }else
+       {
+           document.getElementById("album_lastFM_Auto_Complete").value = false
+           elementArray.forEach(function (i){
+               console.log(i)
+               document.getElementById(i).required = true;
+               document.getElementById(i).disabled = false;
+           })
+       }
+    }
+
+    let COUNT = 0;
+    let TRACKS= [];
+
+    function addNewFields()
+    {
+        console.log("new");
+        /**
+         * isssue with the way this is done need to clear the values once the a field is added as text is cleared
+         * from the input box but the value is the same
+         */
+
+        let input = `
+            <div class='row' id='trackField${COUNT}'>
+                <div class='col'>
+                    <input type='string' class='' id='trackName${COUNT}' onchange="updateText()" required>
+                </div>
+                <div class='col'>
+                    <input type='time' class='' id='trackLengths${COUNT}' onchange="updateText()" required>
+                </div>
+                <div class='col-sm'>
+                    <button type='button' class='btn btn-danger' onclick='deleteField(${COUNT})'>Delete Field</button>
+                </div>
+            </div>
+            <div class="row"></div>
+        `;
+        document.getElementById("extra").innerHTML += input;
+        TRACKS.push(COUNT);
+        updateData();
+        clearValues()
+        COUNT++;
+        /**
+         * symfony sucks for not being able to dynamically gen fields for a form like this wihtout jquery
+         * this could lead to an issue need to sanitize the input
+         *
+         */
+    }
+
+
+    function deleteField(number)
+    {
+        let place = TRACKS.indexOf(number)
+        if(place !== -1)
+        {
+            document.getElementById(`trackField${number}`).remove();
+            TRACKS.splice(place,1);
+        }
+        updateData();
+        updateText();
+    }
+
+
+    function updateData()
+    {
+
+        /**
+         * symfony is not going to be able to access the data from the extra fields so need to pass the data into the
+         * hidden fields bruh this is ass
+         */
+       let numTracks = `
+       <input type="hidden" id="album_numTracks" name="album[numTracks]" value='${TRACKS}'>
+       `;
+
+        document.getElementById("album_numTracks").outerHTML = numTracks;
+    }
+
+    function updateText(mode)
+    {
+
+        let names = [];
+        let lengths = [];
+        console.log(names,lengths);
+        TRACKS.forEach((element) =>
+        {
+
+
+            console.log(element);
+            if(document.getElementById(`trackName${element}`).value !== "" )
+            {
+                names.push(document.getElementById(`trackName${element}`).value);
+            }
+            if(document.getElementById(`trackLengths${element}`).value !== "")
+            {
+                lengths.push(document.getElementById(`trackLengths${element}`).value)
+            }
+
+        });
+
+        let trackNames =
+            `
+                <input type="hidden" id="album_trackNames" name="album[trackNames]" value='${names}'>
+            `;
+        let trackDurations =
+            `
+               <input type="hidden" id="album_trackLengths" name="album[trackLengths]" value='${lengths}'>
+            `;
+        document.getElementById("album_trackNames").outerHTML = trackNames;
+        document.getElementById("album_trackLengths").outerHTML = trackDurations;
+    }
+
+
+    function clearValues()
+    {
+        console.log("currentCount",COUNT);
+        //return to default
+        document.getElementById("album_trackNames").outerHTML = ` <input type="hidden" id="album_trackNames" name="album[trackNames]">`;
+        document.getElementById("album_trackLengths").outerHTML = `<input type="hidden" id="album_trackLengths" name="album[trackLengths]">`;
+
+    }
+
+
+
+
+
+</script>
+{% endblock %}

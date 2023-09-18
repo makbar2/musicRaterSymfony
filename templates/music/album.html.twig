@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="row align-items-center" id="">
+        <div class="col"></div>
+        <div class="col main">
+            {% if album %}
+                <h1>{{ album.name }}</h1>
+                <img src="{{ absolute_url(asset("pictures/uploads/" ~ album.picture)) }}" alt="{{ album.name }} picture"
+                     style="
+                                            max-width: 40vh;
+                                            max-height: 40vh;
+                     "
+                     class="img-thumbnail"
+                >
+                <div class="row" id="info">
+                    <h2>Album info</h2>
+                    <a href="{{ path("app_artist", {'id' : album.artist.id}) }}">{{ album.artist.name }}</a>
+                    <p>Release Date : {{ album.releaseDate.format("d-m-y") }}</p>
+                    <p> average score score : {{ score }}</p>
+                    <p>Genre : {{ album.genre }}</p>
+                    {% if is_granted("ROLE_ADMIN") %}
+                        <form action="{{ path("app_remove_album", {"id" : album.id}) }}">
+                            <button type="submit" value="{{ album.id }}" class="btn btn-danger">Delete album</button>
+                        </form>
+                    {% endif %}
+                </div>
+                <div class="row" id="tracks">
+                    <h2>Tracks</h2>
+                    <ol>
+                        {% for track in album.getTracks %}
+                                <li>{{ track.songName }}, {{ track.duration.format("h-i") }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="row" id="reviews">
+                    <h2>Reviews</h2>
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        {% if not userReview %}
+                            {{ form_start(form) }}
+                                <div class="row">
+                                    {{ form_row(form.text) }}
+                                </div>
+                            <div class="row">
+                                {{ form_row(form.score) }}
+                            </div>
+                            <div class="row">
+                                {{ form_row(form.submit) }}
+                            </div>
+                            {{ form_end(form) }}
+                        {% else %}
+                            <div  id="yourReview" class="your review border">
+                                <h3>Your Review</h3>
+                                 <div class="col">
+                                     {{ userReview.0.text }}
+                                 </div>
+                                <div class="col">
+                                    Score: {{ userReview.0.score }}
+                                </div>
+                                <button class="btn btn-success" onclick="toggle()">edit</button>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    {% if app.user %}{# there is no xor #}
+                        {% for r in album.getReviews %}
+                            {% if (r.author.id != app.user.id) %}
+                                <div class="row border" id="{{ r.id }}" style="padding-top: 1vh;">
+                                    <h3>{{ r.score }}/5</h3>
+                                    <p>
+                                        {{ r.text }}
+                                    </p>
+                                    <a href="{{ path("app_account_profile", {'username' : r.author.username}) }}">{{ r.author.username }}</a>
+                                </div>
+                            {% endif  %}
+                        {% endfor %}
+                    {% else %}
+                        {% for r in album.getReviews %}
+                                <div class="row border" id="{{ r.id }}" style="padding-top: 1vh;">
+                                    <h3>{{ r.score }}/5</h3>
+                                    <p>
+                                        {{ r.text }}
+                                    </p>
+                                    <a href="{{ path("app_account_profile", {'username' : r.author.username}) }}">{{ r.author.username }}</a>
+                                </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="col"></div>
+    </div>
+    <script>
+        {% if userReview %}
+            //dont have time to rework, this will do
+            let TOGGLE = false;
+            const review =
+                `
+                                     <h3>Your Review</h3>
+                                     <div class="col">
+                                         {{ userReview.0.text }}
+                                     </div>
+                                    <div class="col">
+                                        Score: {{ userReview.0.score }}
+                                    </div>
+                                    <button class="btn btn-success" onclick="toggle()">edit</button>
+                `;
+            const form =
+                `
+                     {{ form_start(form) }}
+                         <div class="row">
+                             {{ form_row(form.text) }}
+                         </div>
+                     <div class="row">
+                         {{ form_row(form.score) }}
+                     </div>
+                     <div class="row">
+                         {{ form_row(form.submit) }}
+                     </div>
+                     {{ form_end(form) }}
+                    <button class="btn btn-danger" onclick="toggle()">cancel</button>
+                `;
+            function toggle()
+            {
+                if(TOGGLE === false)
+                {
+                    document.getElementById("yourReview").innerHTML = form
+                    TOGGLE = true;
+                }else
+                {
+                    document.getElementById("yourReview").innerHTML = review;
+                    TOGGLE = false;
+                }
+
+            }
+        {% endif %}
+    </script>
+{% endblock %}

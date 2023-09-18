@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+    <div class="row align-items-center" id="formBlock">
+
+        <div class="col"></div>
+        <div class="col">
+            {% if artist %}
+                <div class="row">
+                    <img src="{{ absolute_url(asset("pictures/uploads/" ~ artist.picture)) }}" alt="{{ artist.name }} picture"
+                         style="
+                        max-height: 45vh;
+                        min-width: 45vh;
+                    "
+                         class="img-thumbnail"
+                    >
+                </div>
+                <div class="row">
+                    <h1>
+                        {{ artist.name }}
+                    </h1>
+                </div>
+                <div class="row">
+                    <h2>Albums</h2>
+                    {% if albums %}
+                        {% for i in albums %}
+                            <div class="row border">
+                                <a href="{{ path("app_album", {'id' : i.id}) }}">{{ i.name }}</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <h3>There are no albums from this artist available on this website</h3>
+                    {% endif %}
+                </div>
+            {% else %}
+                <h1>No artist found, you broke this </h1>
+            {% endif %}
+            <section id="lastFmData">
+                <h2>Top Tracks this week</h2>
+                {% for i in tracks %}
+                    <a href="{{ i.url }}" id="lastFMTrack">
+                        <div class="row">
+                            <div class="col">
+                                {{ i.name }}
+                            </div>
+                            <div class="col">
+                                {{ i.listeners }}:plays this week
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+                {{ totalPages }}
+                <div class="row">
+                    {% for i in 1..totalPages %}
+                        <div class="col">
+                            <a href="{{ path("app_artist", {'id' : artist.id, "page" : i}) }}">
+                                <button class="btn btn-primary">{{ i }}</button>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        <div class="col"></div>
+    </div>
+{% endblock %}

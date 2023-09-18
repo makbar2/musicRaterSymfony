@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+
+<div class="row align-items-center" id="formBlock">
+
+    <div class="col"></div>
+    <div class="col">
+        <h1>Add an Artist</h1>
+        {{ form_start(form, ) }}
+        <div class="row">
+            {{ form_row(form.name) }}
+        </div>
+        <div class="row">
+            {{ form_row(form.picture) }}
+        </div>
+        <div class="row">
+            {{ form_row(form.submit) }}
+        </div>
+        {{ form_end(form) }}
+    </div>
+    <div class="col"></div>
+</div>
+{% endblock %}

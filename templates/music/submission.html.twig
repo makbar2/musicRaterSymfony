@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="row align-items-center" id="">
+        <div class="col"></div>
+        <div class="col" id="main">
+            {% if albums %}
+                {% for i in albums %}
+                    <div class="row border-bottom" style="padding-bottom: 1vh">
+                        <div class="col">
+                            <img src="{{  absolute_url(asset("pictures/uploads/" ~ i.picture))}}"
+                                 alt='{{ i.name }} album cover'
+                                 class="albumCover image-thumbnail"
+                                 style="
+                                        max-width: 36.5vh;
+                                        max-height: 36.5vh;
+                                     "
+                            >
+                        </div>
+                        <div class="col" id="info">
+                            <div class="row">
+                                <h2>Name: {{ i.name }}, id:{{ i.id }}</h2>
+                            </div>
+                            <div class="row">
+                                Artist: {{ i.artist.name }}
+                            </div>
+                            <div class="row">
+                                Tracks:
+                                <ol>
+                                    {% for x in i.getTracks %}
+                                        <div class="row">
+
+                                            <li>{{ x.songName }} : {{ x.duration.format("h-i") }} minutes</li>
+                                            {#
+                                            when the user enters the duration does it in hours and minutes but it
+                                            looks like min:seconds, what ever lol
+                                            #}
+                                        </div>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <form method="post" action="{{ path("app_accept_submission", {'id' : i.id}) }}">
+                                    <button type="submit" class="btn btn-success">approve</button>
+                                </form>
+                            </div>
+                            <div class="col">
+                                <form method="post" action="{{ path("app_decline_submission", {'id' : i.id}) }}">
+                                    <button type="submit" class="btn btn-danger">decline</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% if artists %}
+                {% for i in artists %}
+                    <div class="col">
+                        <img src="{{  absolute_url(asset("pictures/uploads/" ~ i.picture))}}"
+                             alt='{{ i.name }} album cover'
+                             class="albumCover image-thumbnail"
+                             style="
+                                        max-width: 36.5vh;
+                                        max-height: 36.5vh;
+                                     "
+                        >
+                    </div>
+                    <div class="col">
+                        <h2>Name: {{ i.name }}, id:{{ i.id }}</h2>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <form method="post" action="{{ path("app_accept_artist", {'id' : i.id}) }}">
+                                <button type="submit" class="btn btn-success">approve</button>
+                            </form>
+                        </div>
+                        <div class="col">
+                            <form method="post" action="{{ path("app_decline_artist", {'id' : i.id}) }}">
+                                <button type="submit" class="btn btn-danger">decline</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% if not artists and not albums  %}
+                <div class="alert alert-success" role="alert">
+                    There are no albums or artists to approve
+                </div>
+            {% endif  %}
+        </div>
+
+        <div class="col"></div>
+
+    </div>
+
+{% endblock %}
